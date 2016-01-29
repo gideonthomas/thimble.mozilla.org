@@ -26,39 +26,39 @@ var appName = "thimble";
 var routes = require("./routes")(utils, appName);
 var WWW_ROOT = path.resolve(__dirname, "public");
 
+// New stuff
+let server = require("express")();
+
+let templatize = require("./templatize");
+let request = require("./request");
+let security = require("./security");
+
+request.disableHeaders(server, ["x-powered-by"]);
+
 /**
  * Templating engine
  */
-var templateEngine = new nunjucks.Environment([
-  new nunjucks.FileSystemLoader("views"),
-  new nunjucks.FileSystemLoader("bower_components")
-], { autoescape: true });
-templateEngine.addFilter("instantiate", function(input) {
-  var template = new nunjucks.Template(input);
-  return template.render(this.getVariables());
-});
-templateEngine.express(app);
+templatize(server, ["views", "bower_components"]);
 
 /**
  * Logging
  */
 if(env.get("NODE_ENV") === "development") {
-  app.use(logger("dev"));
+  request.log(server, "dev");
 }
 
 /**
  * Content compression
  */
-app.disable('x-powered-by');
-app.use(compress());
+request.compress(server);
 
 /**
  * Content Security Policy (CSP)
  */
-app.use(middleware.addCSP({
-  personaHost: env.get('PERSONA_HOST'),
-  brambleHost: env.get('BRAMBLE_URI')
-}));
+security.csp(server, {
+  frame: [ env.get('BRAMBLE_URI') ],
+  script: [ env.get('BRAMBLE_URI') ]
+});
 
 /**
  * Thimble Favicon
@@ -114,11 +114,6 @@ app.use(lessMiddleWare('public', {
   yuicompress: optimize,
   optimization: optimize ? 0 : 2
 }));
-
-app.use(function(req, res, next) {
-  console.log("Here");
-  next();
-});
 
 routes.init(app, middleware);
 
