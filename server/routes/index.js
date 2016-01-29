@@ -13,7 +13,7 @@ function getPageData(req) {
   return content;
 }
 
-module.exports = function(utils, nunjucksEnv, appName) {
+module.exports = function(utils, appName) {
   config.appName = appName;
 
   return {
