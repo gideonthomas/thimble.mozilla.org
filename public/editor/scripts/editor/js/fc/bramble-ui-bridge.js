@@ -30,14 +30,11 @@ define(function(require) {
     function checkIfMultiFile() {
       var data = bramble.getLayout();
 
-      if(data.sidebarWidth > 0) {
-        // Total width of window
-        var total = data.sidebarWidth + data.firstPaneWidth + data.secondPaneWidth;
-
+      if(parseInt(data.sidebarWidth, 10) > 0) {
         // Set width in percent, easier for window resize
-        $(".filetree-pane-nav").width(((data.sidebarWidth / total) * 100) + "%");
-        $(".editor-pane-nav").width(((data.firstPaneWidth / total) * 100) + "%");
-        $(".preview-pane-nav").width(((data.secondPaneWidth / total) * 100) + "%");
+        $(".filetree-pane-nav").width(data.sidebarWidth);
+        $(".editor-pane-nav").width(data.firstPaneWidth);
+        $(".preview-pane-nav").width(data.secondPaneWidth);
 
         $("#editor-pane-nav-options-menu").hide();
         $("#editor-pane-nav-fileview").hide();
